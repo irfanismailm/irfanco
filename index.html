@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<!--
+  Irfan & Co  —  temporary landing page (work in progress)
+  Everything lives in this one file for zero-config GitHub Pages deploy.
+  Copy is marked with "COPY:" notes below.
+  The signal animation is tunable in the CONFIG block near the bottom.
+-->
+
+<title>Irfan &amp; Co — Signal over noise.</title>
+<meta name="description" content="Irfan & Co is an independent media agency built to earn attention. New site on the way — follow the work on Instagram." />
+<meta name="theme-color" content="#F4F0E8" />
+
+<!-- Open Graph (add an og:image later if you want a share card) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Irfan & Co — Signal over noise." />
+<meta property="og:description" content="Independent media agency. New site on the way — follow the work on Instagram." />
+
+<!-- Favicon: the ampersand mark, per the brand system -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2316130D'/%3E%3Ctext x='50' y='50' dy='.35em' text-anchor='middle' font-family='Arial,Helvetica,sans-serif' font-weight='700' font-size='58' fill='%23C0563A'%3E%26amp;%3C/text%3E%3C/svg%3E" />
+
+<!-- Type: Space Grotesk (display) + Inter (text), per the brand system -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+  /* ── Brand tokens ─────────────────────────────────────────── */
+  :root{
+    --paper:#F4F0E8;   /* primary background            ~60% */
+    --ink:#16130D;     /* logo, headlines, body         ~28% */
+    --stone:#9A9082;   /* captions, rules, secondary     ~7% */
+    --clay:#C0563A;    /* accent / spark only           ≤ 5% */
+
+    --stone-line: color-mix(in srgb, var(--stone) 34%, transparent);
+    --ink-soft:  color-mix(in srgb, var(--ink) 78%, var(--paper));
+
+    --maxw: 1240px;
+    --pad: clamp(1.25rem, 4vw, 3.25rem);
+
+    --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-text: "Inter", system-ui, sans-serif;
+
+    --ease: cubic-bezier(.16,1,.3,1);
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+
+  html{ -webkit-text-size-adjust:100%; }
+
+  body{
+    margin:0;
+    min-height:100svh;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-text);
+    line-height:1.6;                 /* Inter at 1.6, per brand */
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+    overflow-x:hidden;
+  }
+
+  /* faint paper grain — the ambient "noise" the signal rises out of */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none; z-index:0;
+    opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  a{ color:inherit; }
+
+  /* ── Shell ────────────────────────────────────────────────── */
+  .shell{
+    position:relative; z-index:1;
+    min-height:100svh;
+    display:flex; flex-direction:column;
+    max-width:var(--maxw);
+    margin-inline:auto;
+    padding-inline:var(--pad);
+  }
+
+  /* ── Wordmark (letters Ink, ampersand Clay) ───────────────── */
+  .wordmark{
+    font-family:var(--font-display);
+    font-weight:700;
+    letter-spacing:-.03em;           /* the −3% lockup */
+    line-height:1;
+    color:var(--ink);
+    white-space:nowrap;
+  }
+  .amp{ color:var(--clay); }
+
+  /* ── Header ───────────────────────────────────────────────── */
+  .head{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:1rem;
+    padding-block:clamp(1.4rem,3vw,2.25rem);
+    border-bottom:1px solid var(--stone-line);
+  }
+  .head .wordmark{ font-size:1.15rem; }
+
+  .status{
+    display:inline-flex; align-items:center; gap:.6ch;
+    font-size:.72rem; font-weight:500;
+    letter-spacing:.14em; text-transform:uppercase;
+    color:var(--stone);
+    white-space:nowrap;
+  }
+  .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--clay);
+    box-shadow:0 0 0 0 color-mix(in srgb, var(--clay) 55%, transparent);
+    animation:pulse 2.4s var(--ease) infinite;
+  }
+  @keyframes pulse{
+    0%   { box-shadow:0 0 0 0 color-mix(in srgb,var(--clay) 55%,transparent); opacity:1; }
+    60%  { box-shadow:0 0 0 7px color-mix(in srgb,var(--clay) 0%,transparent);  opacity:.55; }
+    100% { box-shadow:0 0 0 0 color-mix(in srgb,var(--clay) 0%,transparent);   opacity:1; }
+  }
+
+  /* ── Hero ─────────────────────────────────────────────────── */
+  .hero{
+    flex:1;
+    display:flex; flex-direction:column; justify-content:center;
+    padding-block:clamp(3rem,9vh,7rem);
+    max-width:62rem;
+  }
+
+  .eyebrow{
+    font-size:.78rem; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase;
+    color:var(--stone);
+    margin:0 0 clamp(1.4rem,3vw,2.2rem);
+  }
+
+  h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(3.1rem,12vw,9.5rem);
+    line-height:.9;
+    letter-spacing:-.035em;          /* tight display tracking */
+    margin:0;
+    color:var(--ink);
+  }
+  h1 .line{ display:block; overflow:hidden; }
+  h1 .h1in{ display:block; will-change:transform; }
+  h1 .stop{ color:var(--clay); }     /* the full stop = one small spark */
+
+  .lede{
+    margin:clamp(1.8rem,4vw,2.6rem) 0 0;
+    max-width:46ch;
+    font-size:clamp(1.05rem,1.7vw,1.28rem);
+    color:var(--ink-soft);
+    text-wrap:pretty;
+  }
+
+  /* ── Instagram link ───────────────────────────────────────── */
+  .cta-row{ margin-top:clamp(2rem,4vw,2.8rem); }
+  .cta{
+    display:inline-flex; align-items:baseline; gap:.55ch;
+    font-family:var(--font-display);
+    font-weight:500; font-size:clamp(1.05rem,1.8vw,1.3rem);
+    letter-spacing:-.02em;
+    text-decoration:none;
+    color:var(--ink);
+    padding:.35em 0;
+    position:relative;
+  }
+  .cta .handle{ position:relative; }
+  .cta .handle::after{           /* Clay underline, wipes in on hover/focus */
+    content:""; position:absolute; left:0; right:0; bottom:-.08em; height:2px;
+    background:var(--clay);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .5s var(--ease);
+  }
+  .cta .arrow{
+    font-family:var(--font-text);
+    color:var(--clay);
+    transition:transform .4s var(--ease);
+  }
+  .cta:hover .handle::after,
+  .cta:focus-visible .handle::after{ transform:scaleX(1); }
+  .cta:hover .arrow,
+  .cta:focus-visible .arrow{ transform:translate(.18em,-.18em); }
+  .cta:focus-visible{ outline:2px solid var(--clay); outline-offset:6px; border-radius:2px; }
+
+  /* ── Signature: the signal strip ──────────────────────────── */
+  .signal-wrap{ padding-top:clamp(2.5rem,6vh,4rem); }
+  .signal{
+    display:block; width:100%;
+    height:clamp(70px,10vh,104px);
+  }
+
+  /* ── Services marquee ─────────────────────────────────────── */
+  .marquee{
+    position:relative;
+    overflow:hidden;
+    padding-block:clamp(1rem,2.4vw,1.4rem);
+    border-top:1px solid var(--stone-line);
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+            mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+  }
+  .marquee-track{
+    display:flex; width:max-content;
+    animation:scroll 46s linear infinite;
+  }
+  .marquee:hover .marquee-track{ animation-play-state:paused; }
+  .marquee-group{
+    display:flex; flex-shrink:0;
+    font-size:.86rem; letter-spacing:.02em;
+    color:var(--stone);
+    white-space:nowrap;
+  }
+  .marquee-group span{ padding-inline:1.6ch; }
+  .marquee-group .sep{ color:var(--clay); opacity:.7; padding-inline:.4ch; }
+  @keyframes scroll{ to{ transform:translateX(-50%); } }
+
+  /* ── Footer ───────────────────────────────────────────────── */
+  .foot{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:1rem; flex-wrap:wrap;
+    padding-block:clamp(1.4rem,3vw,2rem);
+    border-top:1px solid var(--stone-line);
+    font-size:.8rem; color:var(--stone);
+  }
+  .foot .wordmark{ font-size:.95rem; }
+  .foot .slogan{ letter-spacing:.01em; }
+
+  /* ── Entrance choreography ────────────────────────────────── */
+  .reveal{ opacity:0; transform:translateY(14px); animation:rise .85s var(--ease) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+
+  .h1in{ transform:translateY(115%); animation:linein .95s var(--ease) forwards; }
+  @keyframes linein{ to{ transform:none; } }
+
+  .d1{ animation-delay:.12s } .d2{ animation-delay:.26s }
+  .d3{ animation-delay:.40s } .d4{ animation-delay:.54s }
+  .d5{ animation-delay:.74s } .d6{ animation-delay:.90s }
+  .d7{ animation-delay:1.05s} .d8{ animation-delay:1.18s}
+
+  /* ── Responsive tightening ────────────────────────────────── */
+  @media (max-width:560px){
+    .head{ align-items:center; }
+    .status{ font-size:.66rem; }
+    .foot{ font-size:.74rem; }
+  }
+
+  /* ── Respect reduced motion ───────────────────────────────── */
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+    .reveal, .h1in{ opacity:1 !important; transform:none !important; }
+  }
+</style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <!-- HEADER -->
+    <header class="head reveal d1">
+      <div class="wordmark">Irfan<span class="amp">&amp;</span>Co</div>
+      <!-- COPY: status label -->
+      <div class="status"><span class="dot" aria-hidden="true"></span>Work in progress</div>
+    </header>
+
+    <!-- HERO -->
+    <main class="hero">
+      <!-- COPY: eyebrow -->
+      <p class="eyebrow reveal d2">Independent media agency</p>
+
+      <!-- COPY: headline (the slogan, performed by the signal strip below) -->
+      <h1 aria-label="Signal over noise.">
+        <span class="line"><span class="h1in d3">Signal over</span></span>
+        <span class="line"><span class="h1in d4">noise<span class="stop">.</span></span></span>
+      </h1>
+
+      <!-- COPY: supporting line -->
+      <p class="lede reveal d5">
+        Irfan &amp; Co is an independent media agency built to earn attention and turn
+        it into momentum. The full site is on the way — until it lands, the work lives
+        on Instagram.
+      </p>
+
+      <!-- COPY: the only link on the page -->
+      <div class="cta-row reveal d6">
+        <a class="cta" href="https://www.instagram.com/irfanco.media/"
+           target="_blank" rel="noopener"
+           aria-label="Follow Irfan and Co on Instagram (opens in a new tab)">
+          <span class="handle">@irfanco.media</span>
+          <span class="arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+
+      <!-- SIGNATURE: noise → signal → noise -->
+      <div class="signal-wrap reveal d7">
+        <canvas class="signal" id="signal" aria-hidden="true"></canvas>
+      </div>
+    </main>
+
+    <!-- SERVICES MARQUEE (what we do) -->
+    <div class="marquee reveal d8" aria-label="What we do">
+      <div class="marquee-track" id="marquee"><!-- filled by script for a seamless loop --></div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="foot reveal d8">
+      <div class="wordmark">Irfan<span class="amp">&amp;</span>Co</div>
+      <div class="slogan">Signal over noise. · Edition 01 — 2026</div>
+    </footer>
+
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ── CONFIG — retune the signal here ───────────────────────── */
+  const GAP        = 9;    // px between bars
+  const BAR_W      = 2;    // bar thickness
+  const NOISE_FLOOR= 3;    // idle half-height of a bar (the "noise")
+  const CREST      = 26;   // extra half-height at the signal peak
+  const SIGMA      = 34;   // crest width (larger = wider signal)
+  const SWEEP_MS   = 3400; // time for one pulse to cross
+  const REST_MS    = 900;  // quiet gap (near-pure noise) between pulses
+
+  const INK   = [22, 19, 13];
+  const STONE = [154, 144, 130];
+  const CLAY  = [192, 86, 58];
+
+  const canvas = document.getElementById("signal");
+  const ctx = canvas.getContext("2d");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let W = 0, H = 0, dpr = 1, bars = 0;
+
+  function mix(a, b, t) {
+    return "rgb(" +
+      Math.round(a[0] + (b[0] - a[0]) * t) + "," +
+      Math.round(a[1] + (b[1] - a[1]) * t) + "," +
+      Math.round(a[2] + (b[2] - a[2]) * t) + ")";
+  }
+
+  function size() {
+    const r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bars = Math.max(1, Math.floor(W / GAP));
+  }
+
+  // idle shimmer so the flat "noise" is alive, not dead-straight
+  function idle(i, t) {
+    return (Math.sin(i * 0.7 + t * 1.6) + Math.sin(i * 1.3 - t * 1.1)) * 0.5;
+  }
+
+  // draw one frame; `pulseX` is null during the quiet rest
+  function draw(t, pulseX, gain) {
+    ctx.clearRect(0, 0, W, H);
+    const midY = H / 2;
+    for (let i = 0; i < bars; i++) {
+      const x = i * GAP + GAP / 2;
+      let bump = 0;
+      if (pulseX !== null) {
+        const d = x - pulseX;
+        bump = Math.exp(-(d * d) / (2 * SIGMA * SIGMA)) * gain;
+      }
+      const half = NOISE_FLOOR + Math.abs(idle(i, t)) * 1.4 + bump * CREST;
+      ctx.fillStyle = mix(STONE, INK, Math.min(1, bump));
+      ctx.fillRect(x - BAR_W / 2, midY - half, BAR_W, half * 2);
+    }
+    // the Clay spark rides the peak of the signal
+    if (pulseX !== null && gain > 0.02 && pulseX >= 0 && pulseX <= W) {
+      const half = NOISE_FLOOR + CREST * gain;
+      ctx.fillStyle = "rgb(" + CLAY[0] + "," + CLAY[1] + "," + CLAY[2] + ")";
+      ctx.fillRect(pulseX - (BAR_W + 1) / 2, midY - half - 4, BAR_W + 1, (half + 4) * 2);
+    }
+  }
+
+  // Static, calm version for reduced-motion: one clean crest, no loop
+  function drawStatic() {
+    const t = 0, cx = W * 0.34;
+    ctx.clearRect(0, 0, W, H);
+    const midY = H / 2;
+    for (let i = 0; i < bars; i++) {
+      const x = i * GAP + GAP / 2;
+      const d = x - cx;
+      const bump = Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
+      const half = NOISE_FLOOR + bump * CREST;
+      ctx.fillStyle = mix(STONE, INK, bump);
+      ctx.fillRect(x - BAR_W / 2, midY - half, BAR_W, half * 2);
+    }
+    const half = NOISE_FLOOR + CREST;
+    ctx.fillStyle = "rgb(" + CLAY[0] + "," + CLAY[1] + "," + CLAY[2] + ")";
+    ctx.fillRect(cx - (BAR_W + 1) / 2, midY - half - 4, BAR_W + 1, (half + 4) * 2);
+  }
+
+  const CYCLE = SWEEP_MS + REST_MS;
+  const SPREAD = SIGMA * 3;      // let the pulse enter/exit off-canvas
+  let start = null, raf = null;
+
+  function loop(now) {
+    if (start === null) start = now;
+    const t = (now - start) / 1000;
+    const phase = (now - start) % CYCLE;
+
+    let pulseX = null, gain = 0;
+    if (phase < SWEEP_MS) {
+      const p = phase / SWEEP_MS;                       // 0 → 1 across the sweep
+      pulseX = -SPREAD + p * (W + SPREAD * 2);
+      // soft fade-in/out at the edges of the sweep so nothing pops
+      gain = Math.min(1, Math.min(p, 1 - p) * 6);
+    }
+    draw(t, pulseX, gain);
+    raf = requestAnimationFrame(loop);
+  }
+
+  function startLoop() { if (!raf && !reduce) raf = requestAnimationFrame(loop); }
+  function stopLoop()  { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+
+  // Build the seamless services marquee (duplicate group, 2nd copy hidden from SR)
+  (function buildMarquee() {
+    const items = [
+      "Strategy & planning", "Creative & content", "Media planning & buying",
+      "Brand & storytelling", "Social & community", "Performance & measurement"
+    ];
+    const group = () => {
+      const g = document.createElement("div");
+      g.className = "marquee-group";
+      items.forEach((label) => {
+        const s = document.createElement("span"); s.textContent = label;
+        const d = document.createElement("span"); d.className = "sep"; d.textContent = "·";
+        g.appendChild(s); g.appendChild(d);
+      });
+      return g;
+    };
+    const track = document.getElementById("marquee");
+    const a = group();
+    const b = group();
+    b.setAttribute("aria-hidden", "true");
+    track.appendChild(a);
+    track.appendChild(b);
+  })();
+
+  // Wire up sizing + lifecycle
+  size();
+  if (reduce) { drawStatic(); }
+  else { startLoop(); }
+
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => { size(); if (reduce) drawStatic(); }).observe(canvas);
+  } else {
+    window.addEventListener("resize", () => { size(); if (reduce) drawStatic(); });
+  }
+
+  // Be a good citizen: pause when the tab isn't visible
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) stopLoop();
+    else { start = null; startLoop(); }
+  });
+})();
+</script>
+</body>
+</html>
